@@ -43,6 +43,10 @@ public class Table extends JTable {
         this.header = header;
         this.data = data;
 
+        // SGB Update for standard tables: Update for standard inverted cursor
+        this.setSelectionBackground(new Color(75,134,193));
+        this.setSelectionForeground(Color.WHITE);
+        
         if (renderer == null) {
             renderer = new TableCellRenderer();
         }
