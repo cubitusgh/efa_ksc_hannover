@@ -43,6 +43,12 @@ public class Table extends JTable {
         this.header = header;
         this.data = data;
 
+        // SGB Update for standard tables: increase row height for better readability
+        Font f = this.getFont();
+        FontMetrics fm = this.getFontMetrics(f);
+        this.setRowHeight(fm.getHeight()+4);
+
+        
         if (renderer == null) {
             renderer = new TableCellRenderer();
         }
