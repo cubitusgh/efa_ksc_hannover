@@ -37,6 +37,11 @@ public class TableCellRenderer extends DefaultTableCellRenderer {
             boolean isDisabled = value instanceof TableItem && ((TableItem)value).isDisabled();
             String txt = value.toString();
             
+            //SGB Update for standard tables: indent cell content for better readability
+            if (c instanceof JComponent) {
+      	 		    ((JComponent) c).setBorder(BorderFactory.createEmptyBorder(0,6,0,6));
+            }   
+
             if (isMarked && markedBold) {
                 c.setFont(c.getFont().deriveFont(Font.BOLD));
             }

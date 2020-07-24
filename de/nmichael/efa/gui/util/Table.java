@@ -46,7 +46,12 @@ public class Table extends JTable {
         // SGB Update for standard tables: Update for standard inverted cursor
         this.setSelectionBackground(new Color(75,134,193));
         this.setSelectionForeground(Color.WHITE);
-        
+
+        // SGB Update for standard tables: increase row height for better readability
+        Font f = this.getFont();
+        FontMetrics fm = this.getFontMetrics(f);
+        this.setRowHeight(fm.getHeight()+4);
+    
         if (renderer == null) {
             renderer = new TableCellRenderer();
         }
