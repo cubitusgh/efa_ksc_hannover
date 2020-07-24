@@ -40,7 +40,8 @@ public class ItemTypeTable extends ItemType implements ActionListener, ITableEdi
     protected int fontSize = -1;
     private boolean[] columnEditable;
     private ITableEditListener tableEditListener;
-    private boolean toolTipsEnabled = false;
+    // SGB Update for tables: Tooltipp shall be presented only if the value does not fit into row. Tooltips enabled by default as they don't distract any more.
+    private boolean toolTipsEnabled = true;
     private boolean intelligentColumnWidthDisabled = false;
     private int minColumnWidth = -1;
     private int[] minColumnWidths = null;
