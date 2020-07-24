@@ -39,16 +39,24 @@ public class TableCellRenderer extends DefaultTableCellRenderer {
             
             //SGB Update for standard tables: indent cell content for better readability
             if (c instanceof JComponent) {
-      	 		((JComponent) c).setBorder(BorderFactory.createEmptyBorder(0,6,0,6));
-       	 	}
-            
+      	 		    ((JComponent) c).setBorder(BorderFactory.createEmptyBorder(0,6,0,6));
+            }   
+
             if (isMarked && markedBold) {
                 c.setFont(c.getFont().deriveFont(Font.BOLD));
             }
             Color bkgColor = Color.white;
             Color fgColor = Color.black;
+            
+            //SGB Update for standard tables: alternating row color
+            Color alternateColor = new Color(219,234,249);
+            bkgColor = (row % 2 == 0 ? alternateColor : Color.white);
+            
             if (isSelected) {
                 bkgColor = table.getSelectionBackground();
+                // SGB Update for standard tables: when selected, we should always use the selection foreground.
+                fgColor= table.getSelectionForeground();
+                
             } else {
                 if (isDisabled && disabledBkgColor != null) {
                     bkgColor = disabledBkgColor;
@@ -57,12 +65,23 @@ public class TableCellRenderer extends DefaultTableCellRenderer {
                     bkgColor = markedBkgColor;
                 }
             }
-            if (isDisabled && disabledFgColor != null) {
-                fgColor = disabledFgColor;
+            if (!isSelected && isDisabled && disabledFgColor != null) {
+                fgColor = disabledFgColor; // disabled color to be used only when col is not selected.
             }
+            
             if (isMarked && markedFgColor != null) {
                 fgColor = markedFgColor;
+            	if (isSelected) {
+                    // SGB Update for standard tables: when selected, we should always use the selection foreground.
+                    // Marked FG color is red by default, and does not work well with blue as alternating line color.
+
+            		fgColor = table.getSelectionForeground(); 
+            	}
+            	else {
+            		fgColor = markedFgColor;
+            	}
             }
+            
             if (fontSize > 0) {
                 c.setFont(c.getFont().deriveFont((float)fontSize));
                 c.setFont(c.getFont().deriveFont(Font.BOLD));
