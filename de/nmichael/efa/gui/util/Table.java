@@ -29,8 +29,7 @@ public class Table extends JTable {
     private boolean dontResize = false;
     private boolean[] columnEditable;
     private ITableEditListener editListener;
-    // SGB Update for tables: Tooltipp shall be presented only if the value does not fit into row. Tooltips enabled by default as they don't distract any more.
-    private boolean toolTipsEnabled = true;
+    private boolean toolTipsEnabled = false;
     private boolean intelligentColumnWidthDisabled = false;
     private int minColumnWidth = 50;
     private int[] minColumnWidths = null;
