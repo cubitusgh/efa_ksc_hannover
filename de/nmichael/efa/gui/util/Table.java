@@ -29,7 +29,8 @@ public class Table extends JTable {
     private boolean dontResize = false;
     private boolean[] columnEditable;
     private ITableEditListener editListener;
-    private boolean toolTipsEnabled = false;
+    // SGB Update for tables: Tooltipp shall be presented only if the value does not fit into row. Tooltips enabled by default as they don't distract any more.
+    private boolean toolTipsEnabled = true;
     private boolean intelligentColumnWidthDisabled = false;
     private int minColumnWidth = 50;
     private int[] minColumnWidths = null;
@@ -248,8 +249,22 @@ public class Table extends JTable {
             if (toolTipsEnabled) {
                 int row = rowAtPoint(event.getPoint());
                 int col = columnAtPoint(event.getPoint());
-                return getValueAt(row, col).toString();
-            }
+                
+				// SGB Update for tables: Tooltipp shall be presented only if the value does not fit into row. 
+                if (col!=-1 && row !=-1) {
+					
+                	javax.swing.table.TableCellRenderer l_renderer = getCellRenderer(row, col);
+					Component l_component = prepareRenderer (l_renderer, row, col);
+					Rectangle l_cellRect=getCellRect(row, col, false);
+	
+					if (l_cellRect.width >= l_component.getPreferredSize().width) {
+						// do not show any tooltip if the column has enough space for the value
+						return null;
+					} else {
+						return getValueAt(row, col).toString();
+					}
+				}
+             }
         } catch (Exception eignore) {
         }
         return null;
