@@ -233,6 +233,8 @@ public class EfaConfig extends StorageObject implements IItemFactory {
     private ItemTypeBoolean efaDirekt_immerImVordergrund;
     private ItemTypeBoolean efaDirekt_immerImVordergrundBringToFront;
     private ItemTypeBoolean efaDirekt_tabelleAlternierendeZeilenfarben;
+    private ItemTypeBoolean efaDirekt_tabelleShowTooltip;
+    private ItemTypeBoolean efaDirekt_alternierendeZeilenfarben;
     private ItemTypeStringList efaDirekt_bnrMsgToAdminDefaultRecipient;
     private ItemTypeBoolean efaDirekt_bnrError_admin;
     private ItemTypeBoolean efaDirekt_bnrError_bootswart;
@@ -594,6 +596,9 @@ public class EfaConfig extends StorageObject implements IItemFactory {
             addParameter(efaDirekt_tabelleAlternierendeZeilenfarben = new ItemTypeBoolean("EfaBoathouseTablesAlternatingRowColor", true, 
             		IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
             		International.getString("Tabellen mit alternierenden Zeilenfarben")));
+            addParameter(efaDirekt_tabelleShowTooltip = new ItemTypeBoolean("EfaBoathouseTablesShowTooltip", true, 
+            		IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+            		International.getString("Tabellen mit Tooltipps für zu lange Texte")));            
             addParameter(popupComplete = new ItemTypeBoolean("AutoCompleteListShow", true,
                     IItemType.TYPE_EXPERT,BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
                     International.getString("Beim Vervollständigen Popup-Liste anzeigen")));
@@ -1843,6 +1848,11 @@ public class EfaConfig extends StorageObject implements IItemFactory {
     public boolean getValueEfaDirekt_tabelleAlternierendeZeilenFarben() {
     	return efaDirekt_tabelleAlternierendeZeilenfarben.getValue();
     }
+
+    public boolean getValueEfaDirekt_tabelleShowTooltip() {
+    	return efaDirekt_tabelleShowTooltip.getValue();
+    }
+
     
     public String getValueEfaDirekt_bnrMsgToAdminDefaultRecipient() {
         return efaDirekt_bnrMsgToAdminDefaultRecipient.getValue();
