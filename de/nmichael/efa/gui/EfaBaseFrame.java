@@ -4501,45 +4501,12 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
         setFieldEnabled(true, Daten.efaConfig.getValueEfaDirekt_showBootsschadenButton(), boatDamageButton);
         setFieldEnabled(true, Daten.efaConfig.getShowBoatNotCleanedButton(), boatNotCleanedButton);
 
-        /* EFA_0015 - Late Entry shall use data from latest session, if boat and person both are null
-         * (so the user started "late entry" without choosing a boat or a person in advance */
-        if (item != null && (item.boat != null || item.person!=null)) {
-        	efaBoathouseSetPersonAndBoat(item);
-        } else {
-        	efaBoathouseSetDataFromLatestSession();
-        }
+        efaBoathouseSetPersonAndBoat(item);
         updateTimeInfoFields();
         setRequestFocus(date);
         return true;
     }
 
-    
-    private void efaBoathouseSetDataFromLatestSession() {
-    	
-    	LogbookRecord myReference = logbook.getLastLogbookRecord();
-    	
-    	//last entry might be null if the logbook is empty
-    	if (myReference != null) {
-    		// we want to present the values of the last record only when we want to
-    		// add a new entry within 10 minutes after the last one
-    		if ((System.currentTimeMillis()-myReference.getLastModified())< (2*60*1000)) {
-    			
-	    		setField(date, myReference);
-	    		setField(enddate, myReference);
-	    		setField(starttime, myReference);
-	    		setField(endtime, myReference);
-	    		setField(destination, myReference);
-	            setDestinationInfo( (myReference != null ? myReference.getDestinationRecord(getValidAtTimestamp(myReference)) : null) );
-	    		setField(waters, myReference);
-	    		setField(distance,myReference);
-	    		setField(comments, myReference);
-    		}
-    		
-    	}
-    	
-    }
-    
-    
     boolean efaBoathouseAbortSession(ItemTypeBoatstatusList.BoatListItem item) {
         currentRecord = null;
         try {
@@ -4642,15 +4609,11 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
                     break;
                 case EfaBaseFrame.MODE_BOATHOUSE_FINISH:
                 case EfaBaseFrame.MODE_BOATHOUSE_ABORT:
-                    //old newStatus = BoatStatusRecord.STATUS_AVAILABLE;
-                    if (boatStatusRecord == null) {
-                    	// Ein unbekanntes Boot - d.h. das nicht in der Bootliste ist
-                        // Dann gibt es keinen BoatStatusRecord-Objekt.
-                        // Setzen wir den neuen Status einfach auf Available
-                    	newStatus= BoatStatusRecord.STATUS_AVAILABLE;
+                    if (boatStatusRecord == null || boatStatusRecord.getBaseStatus() == null) {
+                        newStatus = BoatStatusRecord.STATUS_AVAILABLE;
                     } else {
-                    	// bekanntes Boot - BoatStatusRecord auf den Basisstatus des Boots setzen.
-                    	newStatus=boatStatusRecord.getBaseStatus();
+                        // this boat has a defined base status: use this status
+                        newStatus = boatStatusRecord.getBaseStatus();
                     }             
                     newComment = "";
                     break;
