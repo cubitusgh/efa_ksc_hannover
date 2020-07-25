@@ -95,6 +95,11 @@ public class ItemTypeTable extends ItemType implements ActionListener, ITableEdi
         fieldGridAnchor = GridBagConstraints.CENTER;
         fieldGridFill = GridBagConstraints.NONE;
         this.toolTipsEnabled= Daten.efaConfig.getValueEfaDirekt_tabelleShowTooltip();
+        fieldGridFill = GridBagConstraints.BOTH;
+        
+        padXbefore = 10;
+        padXafter = 10;
+        //padYbefore = 10;
     }
 
     private static TableItemHeader[] createTableHeader(String[] header) {
@@ -275,8 +280,8 @@ public class ItemTypeTable extends ItemType implements ActionListener, ITableEdi
     public int displayOnGui(Window dlg, JPanel panel, int x, int y) {
         this.dlg = dlg;
         iniDisplay();
-        panel.add(scrollPane, new GridBagConstraints(x, y, fieldGridWidth, fieldGridHeight, 0.0, 0.0,
-                fieldGridAnchor, fieldGridFill, new Insets(padYbefore, padXbefore, padYafter, padXafter), 0, 0));
+        panel.add(scrollPane, new GridBagConstraints(x, y, fieldGridWidth, fieldGridHeight, 1.0, 1.0,
+                fieldGridAnchor, fieldGridFill, new Insets(padYbefore, padXbefore+10, padYafter, padXafter+10), 0, 0));
         return 1;
     }
 

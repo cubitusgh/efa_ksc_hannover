@@ -9,15 +9,28 @@
  */
 package de.nmichael.efa.gui.util;
 
-import de.nmichael.efa.core.items.ITableEditListener;
-import de.nmichael.efa.gui.*;
-import de.nmichael.efa.util.Logger;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.EventObject;
-import javax.swing.*;
+
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
+
+import de.nmichael.efa.Daten;
+
+import de.nmichael.efa.core.items.ITableEditListener;
+import de.nmichael.efa.gui.BaseDialog;
+import de.nmichael.efa.util.Logger;
 
 public class Table extends JTable {
 
@@ -43,10 +56,28 @@ public class Table extends JTable {
         this.header = header;
         this.data = data;
 
+        if (Daten.efaConfig.getValueEfaDirekt_alternierendeZeilenFarben()) {
+        	// SGB Update for standard tables: Update for standard inverted cursor
+        	// only applied when using alternating row colors - otherwise the lookandfeel standard is used.
+	        this.setSelectionBackground(new Color(75,134,193));
+	        this.setSelectionForeground(Color.WHITE);
+        }
+        
+        // SGB Update for standard tables: increase row height for better readability
+        Font f = this.getFont();
+        FontMetrics fm = this.getFontMetrics(f);
+        this.setRowHeight(fm.getHeight()+4);
+    
         if (renderer == null) {
             renderer = new TableCellRenderer();
         }
         setDefaultRenderer(Object.class, renderer);
+        
+        // SGB Update for standard tables: Replace default header renderer with bold+dark background renderer 
+        javax.swing.table.TableCellRenderer l_originalRenderer = this.getTableHeader().getDefaultRenderer();
+	        
+        this.getTableHeader().setDefaultRenderer(new TableHeaderCellRendererBold(l_originalRenderer));
+        
         this.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         if (allowSorting) {
             sorter.addMouseListenerToHeaderInTable(this);
