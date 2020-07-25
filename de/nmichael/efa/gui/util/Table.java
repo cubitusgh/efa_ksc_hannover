@@ -10,9 +10,12 @@
 package de.nmichael.efa.gui.util;
 
 import java.awt.Color;
+
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -24,6 +27,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 
 import de.nmichael.efa.Daten;
+
 import de.nmichael.efa.core.items.ITableEditListener;
 import de.nmichael.efa.gui.BaseDialog;
 import de.nmichael.efa.util.Logger;
@@ -68,6 +72,12 @@ public class Table extends JTable {
             renderer = new TableCellRenderer();
         }
         setDefaultRenderer(Object.class, renderer);
+        
+        // SGB Update for standard tables: Replace default header renderer with bold+dark background renderer 
+        javax.swing.table.TableCellRenderer l_originalRenderer = this.getTableHeader().getDefaultRenderer();
+	        
+        this.getTableHeader().setDefaultRenderer(new TableHeaderCellRendererBold(l_originalRenderer));
+        
         this.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         if (allowSorting) {
             sorter.addMouseListenerToHeaderInTable(this);
@@ -269,8 +279,22 @@ public class Table extends JTable {
             if (toolTipsEnabled) {
                 int row = rowAtPoint(event.getPoint());
                 int col = columnAtPoint(event.getPoint());
-                return getValueAt(row, col).toString();
-            }
+                
+				// SGB Update for tables: Tooltipp shall be presented only if the value does not fit into row. 
+                if (col!=-1 && row !=-1) {
+					
+                	javax.swing.table.TableCellRenderer l_renderer = getCellRenderer(row, col);
+					Component l_component = prepareRenderer (l_renderer, row, col);
+					Rectangle l_cellRect=getCellRect(row, col, false);
+	
+					if (l_cellRect.width >= l_component.getPreferredSize().width) {
+						// do not show any tooltip if the column has enough space for the value
+						return null;
+					} else {
+						return getValueAt(row, col).toString();
+					}
+				}
+             }
         } catch (Exception eignore) {
         }
         return null;
