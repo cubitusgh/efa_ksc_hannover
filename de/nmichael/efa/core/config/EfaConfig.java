@@ -232,7 +232,7 @@ public class EfaConfig extends StorageObject implements IItemFactory {
     private ItemTypeBoolean efaDirekt_fensterNichtVerschiebbar;
     private ItemTypeBoolean efaDirekt_immerImVordergrund;
     private ItemTypeBoolean efaDirekt_immerImVordergrundBringToFront;
-    private ItemTypeBoolean efaDirekt_alternierendeZeilenfarben;
+    private ItemTypeBoolean efaDirekt_tabelleAlternierendeZeilenfarben;
     private ItemTypeStringList efaDirekt_bnrMsgToAdminDefaultRecipient;
     private ItemTypeBoolean efaDirekt_bnrError_admin;
     private ItemTypeBoolean efaDirekt_bnrError_bootswart;
@@ -591,7 +591,7 @@ public class EfaConfig extends StorageObject implements IItemFactory {
             addParameter(lafButtonFocusColor = new ItemTypeColor("LookAndFeel_ButtonFocusColor", "",
                     IItemType.TYPE_EXPERT, BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
                     "Look & Feel ButtonFocusColor"));
-            addParameter(efaDirekt_alternierendeZeilenfarben = new ItemTypeBoolean("EfaBoathouseTablesAlternatingRowColor", true, 
+            addParameter(efaDirekt_tabelleAlternierendeZeilenfarben = new ItemTypeBoolean("EfaBoathouseTablesAlternatingRowColor", true, 
             		IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
             		International.getString("Tabellen mit alternierenden Zeilenfarben")));
             addParameter(popupComplete = new ItemTypeBoolean("AutoCompleteListShow", true,
@@ -1840,8 +1840,8 @@ public class EfaConfig extends StorageObject implements IItemFactory {
         return efaDirekt_immerImVordergrundBringToFront.getValue();
     }
 
-    public boolean getValueEfaDirekt_alternierendeZeilenFarben() {
-    	return efaDirekt_alternierendeZeilenfarben.getValue();
+    public boolean getValueEfaDirekt_tabelleAlternierendeZeilenFarben() {
+    	return efaDirekt_tabelleAlternierendeZeilenfarben.getValue();
     }
     
     public String getValueEfaDirekt_bnrMsgToAdminDefaultRecipient() {
