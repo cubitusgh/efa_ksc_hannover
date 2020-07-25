@@ -9,15 +9,24 @@
  */
 package de.nmichael.efa.gui.util;
 
-import de.nmichael.efa.core.items.ITableEditListener;
-import de.nmichael.efa.gui.*;
-import de.nmichael.efa.util.Logger;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.EventObject;
-import javax.swing.*;
+
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
+
+import de.nmichael.efa.Daten;
+import de.nmichael.efa.core.items.ITableEditListener;
+import de.nmichael.efa.gui.BaseDialog;
+import de.nmichael.efa.util.Logger;
 
 public class Table extends JTable {
 
@@ -43,10 +52,13 @@ public class Table extends JTable {
         this.header = header;
         this.data = data;
 
-        // SGB Update for standard tables: Update for standard inverted cursor
-        this.setSelectionBackground(new Color(75,134,193));
-        this.setSelectionForeground(Color.WHITE);
-
+        if (Daten.efaConfig.getValueEfaDirekt_alternierendeZeilenFarben()) {
+        	// SGB Update for standard tables: Update for standard inverted cursor
+        	// only applied when using alternating row colors - otherwise the lookandfeel standard is used.
+	        this.setSelectionBackground(new Color(75,134,193));
+	        this.setSelectionForeground(Color.WHITE);
+        }
+        
         // SGB Update for standard tables: increase row height for better readability
         Font f = this.getFont();
         FontMetrics fm = this.getFontMetrics(f);

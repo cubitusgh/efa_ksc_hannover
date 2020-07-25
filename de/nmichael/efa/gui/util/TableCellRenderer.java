@@ -15,6 +15,9 @@ import javax.swing.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
+
+import de.nmichael.efa.Daten;
+
 import java.util.Vector;
 
 public class TableCellRenderer extends DefaultTableCellRenderer {
@@ -48,10 +51,13 @@ public class TableCellRenderer extends DefaultTableCellRenderer {
             Color bkgColor = Color.white;
             Color fgColor = Color.black;
             
-            //SGB Update for standard tables: alternating row color
-            Color alternateColor = new Color(219,234,249);
-            bkgColor = (row % 2 == 0 ? alternateColor : Color.white);
-            
+           
+            if (Daten.efaConfig.getValueEfaDirekt_alternierendeZeilenFarben()) {
+	            //SGB Update for standard tables: alternating row color
+	            Color alternateColor = new Color(219,234,249);
+	            bkgColor = (row % 2 == 0 ? alternateColor : Color.white);
+            }
+	            
             if (isSelected) {
                 bkgColor = table.getSelectionBackground();
                 // SGB Update for standard tables: when selected, we should always use the selection foreground.
