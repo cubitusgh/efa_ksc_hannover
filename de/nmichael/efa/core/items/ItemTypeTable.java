@@ -10,13 +10,29 @@
 
 package de.nmichael.efa.core.items;
 
-import de.nmichael.efa.util.*;
-import de.nmichael.efa.util.Dialog;
-import de.nmichael.efa.gui.util.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.util.Arrays;
+import java.util.Hashtable;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+
+import de.nmichael.efa.Daten;
+import de.nmichael.efa.gui.util.EfaMouseListener;
+import de.nmichael.efa.gui.util.Table;
+import de.nmichael.efa.gui.util.TableCellRenderer;
+import de.nmichael.efa.gui.util.TableItem;
+import de.nmichael.efa.gui.util.TableItemHeader;
 
 // @i18n complete
 
@@ -40,8 +56,7 @@ public class ItemTypeTable extends ItemType implements ActionListener, ITableEdi
     protected int fontSize = -1;
     private boolean[] columnEditable;
     private ITableEditListener tableEditListener;
-    // SGB Update for tables: Tooltipp shall be presented only if the value does not fit into row. Tooltips enabled by default as they don't distract any more.
-    private boolean toolTipsEnabled = true;
+    private boolean toolTipsEnabled = false;
     private boolean intelligentColumnWidthDisabled = false;
     private int minColumnWidth = -1;
     private int[] minColumnWidths = null;
@@ -79,6 +94,7 @@ public class ItemTypeTable extends ItemType implements ActionListener, ITableEdi
         fieldHeight = 300;
         fieldGridAnchor = GridBagConstraints.CENTER;
         fieldGridFill = GridBagConstraints.NONE;
+        this.toolTipsEnabled= Daten.efaConfig.getValueEfaDirekt_tabelleShowTooltip();
     }
 
     private static TableItemHeader[] createTableHeader(String[] header) {

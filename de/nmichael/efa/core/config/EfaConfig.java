@@ -232,6 +232,7 @@ public class EfaConfig extends StorageObject implements IItemFactory {
     private ItemTypeBoolean efaDirekt_fensterNichtVerschiebbar;
     private ItemTypeBoolean efaDirekt_immerImVordergrund;
     private ItemTypeBoolean efaDirekt_immerImVordergrundBringToFront;
+    private ItemTypeBoolean efaDirekt_tabelleShowTooltip;
     private ItemTypeStringList efaDirekt_bnrMsgToAdminDefaultRecipient;
     private ItemTypeBoolean efaDirekt_bnrError_admin;
     private ItemTypeBoolean efaDirekt_bnrError_bootswart;
@@ -590,6 +591,9 @@ public class EfaConfig extends StorageObject implements IItemFactory {
             addParameter(lafButtonFocusColor = new ItemTypeColor("LookAndFeel_ButtonFocusColor", "",
                     IItemType.TYPE_EXPERT, BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
                     "Look & Feel ButtonFocusColor"));
+            addParameter(efaDirekt_tabelleShowTooltip = new ItemTypeBoolean("EfaBoathouseTablesShowTooltip", true, 
+            		IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+            		International.getString("Tabellen mit Tooltipps für zu lange Texte")));            
             addParameter(popupComplete = new ItemTypeBoolean("AutoCompleteListShow", true,
                     IItemType.TYPE_EXPERT,BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
                     International.getString("Beim Vervollständigen Popup-Liste anzeigen")));
@@ -1836,6 +1840,11 @@ public class EfaConfig extends StorageObject implements IItemFactory {
         return efaDirekt_immerImVordergrundBringToFront.getValue();
     }
 
+    public boolean getValueEfaDirekt_tabelleShowTooltip() {
+    	return efaDirekt_tabelleShowTooltip.getValue();
+    }
+
+    
     public String getValueEfaDirekt_bnrMsgToAdminDefaultRecipient() {
         return efaDirekt_bnrMsgToAdminDefaultRecipient.getValue();
     }
