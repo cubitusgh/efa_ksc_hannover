@@ -231,7 +231,8 @@ public class EfaConfig extends StorageObject implements IItemFactory {
     private ItemTypeBoolean efaDirekt_startMaximized;
     private ItemTypeBoolean efaDirekt_fensterNichtVerschiebbar;
     private ItemTypeBoolean efaDirekt_immerImVordergrund;
-    private ItemTypeBoolean efaDirekt_immerImVordergrundBringToFront;ly
+    private ItemTypeBoolean efaDirekt_immerImVordergrundBringToFront;
+    private ItemTypeBoolean efaDirekt_tabelleAlternierendeZeilenfarben;
     private ItemTypeBoolean efaDirekt_tabelleShowTooltip;
     private ItemTypeBoolean efaDirekt_alternierendeZeilenfarben;
     private ItemTypeStringList efaDirekt_bnrMsgToAdminDefaultRecipient;
@@ -592,6 +593,9 @@ public class EfaConfig extends StorageObject implements IItemFactory {
             addParameter(lafButtonFocusColor = new ItemTypeColor("LookAndFeel_ButtonFocusColor", "",
                     IItemType.TYPE_EXPERT, BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
                     "Look & Feel ButtonFocusColor"));
+            addParameter(efaDirekt_tabelleAlternierendeZeilenfarben = new ItemTypeBoolean("EfaBoathouseTablesAlternatingRowColor", true, 
+            		IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+            		International.getString("Tabellen mit alternierenden Zeilenfarben")));
             addParameter(efaDirekt_tabelleShowTooltip = new ItemTypeBoolean("EfaBoathouseTablesShowTooltip", true, 
             		IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
             		International.getString("Tabellen mit Tooltipps für zu lange Texte")));            
@@ -792,9 +796,6 @@ public class EfaConfig extends StorageObject implements IItemFactory {
             addParameter(efaDirekt_immerImVordergrundBringToFront = new ItemTypeBoolean("EfaBoathouseWindowAlwaysOnTopBringToFront", false,
                     IItemType.TYPE_INTERNAL,BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
                     International.getString("efa immer im Vordergrund") + " (bringToFront)"));
-            addParameter(efaDirekt_alternierendeZeilenfarben = new ItemTypeBoolean("EfaBoathouseTablesAlternatingRowColor", true, 
-            		IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
-            		International.getString("Tabellen mit alternierenden Zeilenfarben")));
             addParameter(efaDirekt_fontSize = new ItemTypeInteger("EfaBoathouseFontSize", 16, 6, 32, false,
                     IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
                     International.getString("Schriftgröße in Punkten (6 bis 32, Standard: 12)")));
@@ -1844,12 +1845,12 @@ public class EfaConfig extends StorageObject implements IItemFactory {
         return efaDirekt_immerImVordergrundBringToFront.getValue();
     }
 
-    public boolean getValueEfaDirekt_tabelleShowTooltip() {
-    	return efaDirekt_tabelleShowTooltip.getValue();
+    public boolean getValueEfaDirekt_tabelleAlternierendeZeilenFarben() {
+    	return efaDirekt_tabelleAlternierendeZeilenfarben.getValue();
     }
 
-    public boolean getValueEfaDirekt_alternierendeZeilenFarben() {
-    	return efaDirekt_alternierendeZeilenfarben.getValue();
+    public boolean getValueEfaDirekt_tabelleShowTooltip() {
+    	return efaDirekt_tabelleShowTooltip.getValue();
     }
 
     
