@@ -52,7 +52,7 @@ public class TableCellRenderer extends DefaultTableCellRenderer {
             Color fgColor = Color.black;
             
            
-            if (Daten.efaConfig.getValueEfaDirekt_alternierendeZeilenFarben()) {
+            if (Daten.efaConfig.getValueEfaDirekt_tabelleAlternierendeZeilenFarben()) {
 	            //SGB Update for standard tables: alternating row color
 	            Color alternateColor = new Color(219,234,249);
 	            bkgColor = (row % 2 == 0 ? alternateColor : Color.white);

@@ -56,7 +56,7 @@ public class Table extends JTable {
         this.header = header;
         this.data = data;
 
-        if (Daten.efaConfig.getValueEfaDirekt_alternierendeZeilenFarben()) {
+        if (Daten.efaConfig.getValueEfaDirekt_tabelleAlternierendeZeilenFarben()) {
         	// SGB Update for standard tables: Update for standard inverted cursor
         	// only applied when using alternating row colors - otherwise the lookandfeel standard is used.
 	        this.setSelectionBackground(new Color(75,134,193));
