@@ -232,6 +232,7 @@ public class EfaConfig extends StorageObject implements IItemFactory {
     private ItemTypeBoolean efaDirekt_fensterNichtVerschiebbar;
     private ItemTypeBoolean efaDirekt_immerImVordergrund;
     private ItemTypeBoolean efaDirekt_immerImVordergrundBringToFront;
+    private ItemTypeBoolean efaDirekt_alternierendeZeilenfarben;
     private ItemTypeStringList efaDirekt_bnrMsgToAdminDefaultRecipient;
     private ItemTypeBoolean efaDirekt_bnrError_admin;
     private ItemTypeBoolean efaDirekt_bnrError_bootswart;
@@ -787,6 +788,9 @@ public class EfaConfig extends StorageObject implements IItemFactory {
             addParameter(efaDirekt_immerImVordergrundBringToFront = new ItemTypeBoolean("EfaBoathouseWindowAlwaysOnTopBringToFront", false,
                     IItemType.TYPE_INTERNAL,BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
                     International.getString("efa immer im Vordergrund") + " (bringToFront)"));
+            addParameter(efaDirekt_alternierendeZeilenfarben = new ItemTypeBoolean("EfaBoathouseTablesAlternatingRowColor", true, 
+            		IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
+            		International.getString("Tabellen mit alternierenden Zeilenfarben")));
             addParameter(efaDirekt_fontSize = new ItemTypeInteger("EfaBoathouseFontSize", 16, 6, 32, false,
                     IItemType.TYPE_PUBLIC,BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
                     International.getString("Schriftgröße in Punkten (6 bis 32, Standard: 12)")));
@@ -1836,6 +1840,10 @@ public class EfaConfig extends StorageObject implements IItemFactory {
         return efaDirekt_immerImVordergrundBringToFront.getValue();
     }
 
+    public boolean getValueEfaDirekt_alternierendeZeilenFarben() {
+    	return efaDirekt_alternierendeZeilenfarben.getValue();
+    }
+    
     public String getValueEfaDirekt_bnrMsgToAdminDefaultRecipient() {
         return efaDirekt_bnrMsgToAdminDefaultRecipient.getValue();
     }
