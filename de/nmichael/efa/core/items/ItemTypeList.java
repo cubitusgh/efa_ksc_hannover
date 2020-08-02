@@ -10,25 +10,60 @@
 
 package de.nmichael.efa.core.items;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import de.nmichael.efa.*;
-import de.nmichael.efa.util.*;
-import de.nmichael.efa.util.Dialog;
-import de.nmichael.efa.gui.*;
-import de.nmichael.efa.gui.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Vector;
 
-public class ItemTypeList extends ItemType implements ActionListener {
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.ToolTipManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-    JPanel mypanel;
+import de.nmichael.efa.Daten;
+import de.nmichael.efa.gui.BaseDialog;
+import de.nmichael.efa.gui.util.EfaMouseListener;
+import de.nmichael.efa.util.Dialog;
+import de.nmichael.efa.util.Mnemonics;
+
+public class ItemTypeList extends ItemType implements ActionListener, DocumentListener, KeyListener {
+
+    private static final String LIST_SECTION_STRING = "---------- ";
+	JPanel mypanel;
     JLabel label;
     JScrollPane scrollPane;
     JList list = new JList();
+    JTextField filterTextField;
     JPopupMenu popup;
-    Vector<ItemTypeListData> data;
+    DefaultListModel<ItemTypeListData> data;
+    
     String[] actions;
     String incrementalSearch = "";
     int iconWidth = 0;
@@ -119,7 +154,7 @@ public class ItemTypeList extends ItemType implements ActionListener {
         this.type = type;
         this.category = category;
         this.description = description;
-        data = new Vector<ItemTypeListData>();
+        data = new DefaultListModel<ItemTypeListData>();
     }
 
     public IItemType copyOf() {
@@ -127,32 +162,42 @@ public class ItemTypeList extends ItemType implements ActionListener {
     }
 
     public void addItem(String text, Object object, boolean separator, char separatorHotkey) {
-        data.add(new ItemTypeListData(text, object, separator, separatorHotkey));
+        data.addElement(new ItemTypeListData(text, object, separator, separatorHotkey));
+        filter();
     }
 
     public void addItem(String text, Object object, boolean separator, char separatorHotkey,
             String image, Color[] colors) {
-        data.add(new ItemTypeListData(text, object, separator, separatorHotkey, image, colors));
+        data.addElement(new ItemTypeListData(text, object, separator, separatorHotkey, image, colors));
+        filter();
     }
 
     public void removeItem(int idx) {
         if (idx >= 0 && idx < data.size()) {
             data.remove(idx);
+            filter();
         }
     }
 
     public void removeAllItems() {
-        data = new Vector<ItemTypeListData>();
+        data = new DefaultListModel<ItemTypeListData>();
+        filter();
     }
 
     public void setItems(Vector<ItemTypeListData> items) {
         if (data == null) {
-            data = new Vector<ItemTypeListData>();
+            data = new DefaultListModel<ItemTypeListData>();
+            filter();
         }
         if (items != null) {
-            data = items;
+        	data = new DefaultListModel<ItemTypeListData>();
+            for (ItemTypeListData item:items) {
+            	data.addElement(item);
+            }
+            filter();
         } else {
-            data = new Vector<ItemTypeListData>();
+            data = new DefaultListModel<ItemTypeListData>();
+            filter();
         }
     }
 
@@ -213,6 +258,10 @@ public class ItemTypeList extends ItemType implements ActionListener {
         this.dlg = dlg;
 
         list = new JList();
+        filterTextField =new JTextField();
+        filterTextField.getDocument().addDocumentListener(this);
+        filterTextField.addKeyListener(this);
+        
         popup = new JPopupMenu();
         scrollPane = new JScrollPane();
         this.field = scrollPane;
@@ -229,8 +278,11 @@ public class ItemTypeList extends ItemType implements ActionListener {
             if (color != null) {
                 label.setForeground(color);
             }
-            label.setLabelFor(list);
+            label.setFont(label.getFont().deriveFont(Font.BOLD));
+            label.setLabelFor(filterTextField);
             Dialog.setPreferredSize(label, fieldWidth, 20);
+            
+            label.setBorder(new EmptyBorder(4,0,4,0));//4 pixel space before and after the label
         }
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -269,13 +321,53 @@ public class ItemTypeList extends ItemType implements ActionListener {
         });
 
         scrollPane.getViewport().add(list, null);
+        
+        //mypanel
+        //--> panelDescriptionAndFilter (NORTH)
+        //    --> label (for description) (NORTH)
+        //    --> filterTextfield (SOUTH)
+        //--> Scrollpane (CENTER)
+        //    --> JList
+        
         mypanel.setLayout(new BorderLayout());
+        mypanel.setBorder(new EmptyBorder(0,4,0,4));// 4 pixel space on the left and the right side of the panel
+        
+        JPanel panelDescriptionAndFilter=new JPanel();
+        panelDescriptionAndFilter.setLayout(new BorderLayout());
+        panelDescriptionAndFilter.setBorder(new EmptyBorder(4,0,4,0));//4 pix space before and after
         if (getDescription() != null) {
-            mypanel.add(label, BorderLayout.NORTH);
+            panelDescriptionAndFilter.add(label, BorderLayout.NORTH);
         }
+        
+        JPanel filterPanel=new JPanel();
+        filterPanel.setLayout(new BorderLayout());
+        filterPanel.setBorder(new EmptyBorder(4,0,4,0));//4 pix space before and after
+        JLabel myFilterLabel = new JLabel("Filter:");
+        myFilterLabel.setBorder(new EmptyBorder(0,0,0,4));//4 pix space on the right
+        filterPanel.add(myFilterLabel, BorderLayout.WEST);
+        filterPanel.add(filterTextField, BorderLayout.CENTER);
+        
+        panelDescriptionAndFilter.add(filterPanel, BorderLayout.SOUTH);
+        mypanel.add(panelDescriptionAndFilter, BorderLayout.NORTH);
         mypanel.add(scrollPane, BorderLayout.CENTER);
 
         return mypanel;
+    }
+    
+   /*
+    * Creates a Panel - 
+    * 	left side: a Label with a Displaytext
+    *   center: the filter text field
+    */
+    private JPanel createPanelForFilterTextfield(JTextField theFilter, String theDisplayText) {
+    	JPanel myPanel=new JPanel();
+    	myPanel.setBorder(new EmptyBorder(4,0,4,0));//4 pix space top and bottom
+    	myPanel.setLayout(new BorderLayout());
+    	JLabel myLabel = new JLabel();
+    	myLabel.setText(theDisplayText);
+    	mypanel.add(myLabel, BorderLayout.WEST);
+    	mypanel.add(theFilter, BorderLayout.CENTER);
+    	return mypanel;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -305,7 +397,11 @@ public class ItemTypeList extends ItemType implements ActionListener {
     private void list_keyReleased(KeyEvent e) {
         clearPopup();
         if (e != null) {
-            scrollToEntry(String.valueOf(e.getKeyChar()), 15, (e != null && e.getKeyCode() == 38 ? -1 : 1));  // KeyCode 38 == Cursor Up
+        	if (e.getKeyCode()==KeyEvent.VK_ESCAPE) {
+        		filterTextField.requestFocus();
+        	} else {
+        		scrollToEntry(String.valueOf(e.getKeyChar()), 15, (e != null && e.getKeyCode() == 38 ? -1 : 1));  // KeyCode 38 == Cursor Up
+        	}
         }
         if (listener != null) {
             listener.itemListenerAction(this, e);
@@ -325,6 +421,8 @@ public class ItemTypeList extends ItemType implements ActionListener {
     // scrolle in der Liste list (deren Inhalt der Vector entries ist), zu dem Eintrag
     // mit dem Namen such und selektiere ihn. Zeige unterhalb des Boote bis zu plus weitere Einträge.
     private void scrollToEntry(String search, int plus, int direction) {
+    	DefaultListModel <ItemTypeListData> theData= (DefaultListModel)list.getModel();
+    	
         if (list == null || search == null || search.length() == 0) {
             return;
         }
@@ -336,8 +434,8 @@ public class ItemTypeList extends ItemType implements ActionListener {
             if (search.charAt(0) >= '0' && search.charAt(0) <= '9') {
                 int isearch = search.charAt(0) - '0';
                 // search for a section with the corresponding number
-                for (int i=0; i<data.size(); i++) {
-                    if (data.get(i).section == isearch) {
+                for (int i=0; i<theData.size(); i++) {
+                    if (theData.get(i).section == isearch) {
                         index = i;
                         break;
                     }
@@ -349,7 +447,7 @@ public class ItemTypeList extends ItemType implements ActionListener {
 
                 if (incrementalSearch == null || incrementalSearch.length() == 0) {
                     // if we haven't searched for anything before, jump to the start of this section
-                    while (start > 0 && !((String) data.get(start).text).startsWith("---------- ")) {
+                    while (start > 0 && !((String) theData.get(start).text).startsWith(LIST_SECTION_STRING)) {
                         start--;
                     }
                 }
@@ -372,8 +470,8 @@ public class ItemTypeList extends ItemType implements ActionListener {
 
                 boolean startsWith = search.length() == 1; // for single-character search, match strings starting with this search string; otherwise, match somewhere
                 for (int run = 0; run < 2; run++) { // 2 search runs: 1st - start from "start"; 2nd - if no result, restart from 0
-                    for (int i = start; i < data.size(); i++) {
-                        String item = ((String) data.get(i).text).toLowerCase();
+                    for (int i = start; i < theData.size(); i++) {
+                        String item = ((String) theData.get(i).text).toLowerCase();
                         if (startsWith && item.startsWith(search) || !startsWith && item.contains(search)) {
                             index = i;
                             break;
@@ -388,14 +486,14 @@ public class ItemTypeList extends ItemType implements ActionListener {
             }
 
             // check whether we should really select this item
-            while (index >= 0 && index < data.size() && data.get(index).separator) {
+            while (index >= 0 && index < theData.size() && theData.get(index).separator) {
                 index += direction;
             }
 
             // Item found?
-            if (index >= 0 && index < data.size()) {
+            if (index >= 0 && index < theData.size()) {
                 list.setSelectedIndex(index);
-                Rectangle rect = list.getCellBounds(index, (index + plus >= data.size() ? data.size() - 1 : index + plus));
+                Rectangle rect = list.getCellBounds(index, (index + plus >= theData.size() ? theData.size() - 1 : index + plus));
                 list.scrollRectToVisible(rect);
             }
 
@@ -449,8 +547,9 @@ public class ItemTypeList extends ItemType implements ActionListener {
     }
 
     public void showValue() {
-        list.setListData(data);
+        list.setModel(data);
         list.setCellRenderer(new ListDataCellRenderer());
+        filter();
     }
     
     public void getValueFromGui() {
@@ -486,4 +585,73 @@ public class ItemTypeList extends ItemType implements ActionListener {
         return mypanel;
     }
 
+    // functions for documentListener for the filter text field
+    public void insertUpdate(DocumentEvent e) {
+        filter();
+    }
+
+
+    public void removeUpdate(DocumentEvent e) {
+        filter();
+    }
+
+    public void changedUpdate(DocumentEvent e) {
+        filter();
+    }
+
+    //filter items depending on text entered  in the filterTextField.
+    //if filtertextfield is empty, set list Data to the alldata.
+    private void filter() {
+        DefaultListModel<ItemTypeListData> theModel = new DefaultListModel<ItemTypeList.ItemTypeListData>();
+		String s = filterTextField.getText();
+        if (!s.isEmpty()) {
+        	
+        	for (int i=0; i< data.getSize();i++) {
+        		ItemTypeListData item = data.getElementAt(i);
+	            if (item.toString().toLowerCase().contains(s.toLowerCase())||item.toString().startsWith(LIST_SECTION_STRING)){
+	                theModel.addElement(item);
+	            }
+        	}
+        	
+        	// we have a problem if there are section strings at the end of the list
+        	// remove all entrys from the bottom which start with LIST_SECTION_STRING
+
+        	for (int i= theModel.getSize()-1; i>=0;i--) {
+        		if (theModel.getElementAt(i).toString().startsWith(LIST_SECTION_STRING)){
+        			theModel.removeElementAt(i);
+        		}
+        		else {
+        			//we have found a non-section item: break out of the for loop
+        			break;
+        		}
+        			
+        	}
+        	
+        	
+        	
+	        list.setModel(theModel);
+	     } else {
+	    	list.setModel(data);
+	     }
+    }
+    
+    public void keyPressed(KeyEvent e) {
+    	
+    }
+    
+    public void keyReleased(KeyEvent e) {
+    	
+    	if (e.getComponent().equals(filterTextField)) {
+	    	if (e.getKeyCode()== KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
+	    		list.requestFocus();
+	    	} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+	    		filterTextField.setText("");
+	    		filterTextField.requestFocus();
+	    	}
+	    }
+    }
+    
+    public void keyTyped(KeyEvent e) {
+    	
+    }
 }
