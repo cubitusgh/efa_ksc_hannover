@@ -10,6 +10,7 @@
 
 package de.nmichael.efa.gui.dataedit;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -45,6 +46,8 @@ import de.nmichael.efa.util.Logger;
 // @i18n complete
 public class BoatDamageListDialog extends DataListDialog {
 
+	protected ItemTypeBoolean showOpenDamagesOnly;
+		
     public BoatDamageListDialog(Frame parent, AdminRecord admin) {
         super(parent, International.getString("Bootsschäden"), Daten.project.getBoatDamages(false), 0, admin);
         iniValues(null);
@@ -114,15 +117,29 @@ public class BoatDamageListDialog extends DataListDialog {
             table.setDefaultActionForDoubleclick(-1);
         }
 
-        iniControlPanel();
+        iniControlPanel(); // this is empty for the BoatDamageListDialog
+    	iniBoatDamageListFilter(); 
+        
+        //Add the table to the main Panel
         mainPanel.add(mainTablePanel, BorderLayout.CENTER);
 
-        setRequestFocus(table);
-        this.validate();
+        setRequestFocus(table);        this.validate();
         
         table.setIsFilterSet(true);// in der Bootsschadensliste immer filtern, statt mit der Eingabe zu einem Zellwert sprinten
         
-    }    
+    }
+
+	private void iniBoatDamageListFilter() {
+		JPanel myControlPanel= new JPanel();
+    	
+    	showOpenDamagesOnly = new ItemTypeBoolean("SHOW_ACTIVE_DAMAGES_ONLY",
+                true,
+                IItemType.TYPE_PUBLIC, "", International.getString("nur offene Bootsschäden"));
+    	showOpenDamagesOnly.setPadding(0, 0, 0, 0);
+    	showOpenDamagesOnly.displayOnGui(this, myControlPanel, 0, 0);
+    	showOpenDamagesOnly.registerItemListener(this);
+        mainPanel.add(myControlPanel, BorderLayout.NORTH);
+	}    
     
     
     private void iniValues(UUID boatId) {
@@ -131,6 +148,8 @@ public class BoatDamageListDialog extends DataListDialog {
             this.filterFieldValue = boatId.toString();
         }
         super.sortByColumn = 4;
+        //Minimum column widths of 100 pix for the timestamp colums shows at least the date part 
+        this.minColumnWidths = new int[] {0,0,95,95,15};
     }
 
     public void keyAction(ActionEvent evt) {
@@ -207,4 +226,19 @@ public class BoatDamageListDialog extends DataListDialog {
         }
     }
 
+   
+    public void itemListenerAction(IItemType itemType, AWTEvent event) {
+    	
+    	// handle our special filter for active damages, else use default item handler
+    	if (itemType==showOpenDamagesOnly) {
+    		
+    		 if (event.getID() == ActionEvent.ACTION_PERFORMED) {
+    			 showOpenDamagesOnly.getValueFromGui();
+    			 ((BoatDamageItemTypeDataRecordTable) table).setShowOpenDamagesOnly(showOpenDamagesOnly.getValue());	 
+    		 }
+    		
+    	} else {
+    		super.itemListenerAction(itemType, event);
+    	}
+    }
 }
